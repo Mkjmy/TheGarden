@@ -9,4 +9,11 @@
 - run it and it is hosting.
 - get onion link: `sudo docker compose exec tor cat /var/lib/tor/hidden_service/hostname`
 - give link to others
-# TheGarden
+
+### moderation
+- to keep the garden alive (avoid read-only): `sudo docker compose exec app python3 mod_tool.py checkin`
+- to hide a bad post: `sudo docker compose exec app python3 mod_tool.py hide <id>`
+- for more mod commands: `sudo docker compose exec app python3 mod_tool.py help`
+
+### dev status
+this garden is still growing. i am still developing more things for it.

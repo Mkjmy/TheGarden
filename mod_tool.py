@@ -1,81 +1,83 @@
-import sqlite3
+import psycopg2
 import sys
 import os
-
-DB_PATH = "garden.db"
+from urllib.parse import urlparse
 
 def connect_db():
-    if not os.path.exists(DB_PATH):
-        print(f"LỖI: Không tìm thấy file database tại {DB_PATH}")
+    db_url = os.getenv("DATABASE_URL", "postgres://garden:garden@localhost:5432/garden?sslmode=disable")
+    try:
+        conn = psycopg2.connect(db_url)
+        return conn
+    except Exception as e:
+        print(f"ERROR: Could not connect to Database. {e}")
         sys.exit(1)
-    return sqlite3.connect(DB_PATH)
 
 def list_pending():
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, author_name, published_at, category, is_locked FROM threads WHERE published_at > datetime('now') ORDER BY published_at ASC")
+    cursor.execute("SELECT id, title, author_name, published_at, category, is_locked FROM threads WHERE published_at > CURRENT_TIMESTAMP ORDER BY published_at ASC")
     rows = cursor.fetchall()
-    print("\n--- CÁC BÀI VIẾT ĐANG CHỜ (SCHEDULED) ---")
+    print("\n--- PENDING POSTS (SCHEDULED) ---")
     for row in rows:
         status = "[LOCKED]" if row[5] else "[OPEN]"
-        print(f"ID: {row[0]} | {status} | Cat: {row[4]} | Tiêu đề: {row[1]} | Tác giả: {row[2]} | Sẽ đăng: {row[3]}")
+        print(f"ID: {row[0]} | {status} | Cat: {row[4]} | Title: {row[1]} | Author: {row[2]} | Will publish: {row[3]}")
     conn.close()
 
 def hide_thread(thread_id):
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE threads SET is_hidden = 1 WHERE id = ?", (thread_id,))
+    cursor.execute("UPDATE threads SET is_hidden = TRUE WHERE id = %s", (thread_id,))
     conn.commit()
     if cursor.rowcount > 0:
-        print(f"THÀNH CÔNG: Đã ẩn bài viết ID {thread_id}")
+        print(f"SUCCESS: Hidden post ID {thread_id}")
     else:
-        print(f"LỖI: Không tìm thấy bài viết ID {thread_id}")
+        print(f"ERROR: Could not find post ID {thread_id}")
     conn.close()
 
 def move_thread(thread_id, new_category):
     categories = ['feed', 'odd', 'inner', 'thoughts', 'signal']
     if new_category not in categories:
-        print(f"LỖI: Chuyên mục '{new_category}' không hợp lệ. Chọn: {categories}")
+        print(f"ERROR: Category '{new_category}' is invalid. Choose from: {categories}")
         return
     
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE threads SET category = ?, is_locked = 1 WHERE id = ?", (new_category, thread_id))
+    cursor.execute("UPDATE threads SET category = %s, is_locked = TRUE WHERE id = %s", (new_category, thread_id))
     conn.commit()
     if cursor.rowcount > 0:
-        print(f"THÀNH CÔNG: Đã chuyển bài ID {thread_id} sang '{new_category}' (Đã khóa quyền cộng đồng).")
+        print(f"SUCCESS: Moved post ID {thread_id} to '{new_category}' (Community tagging locked).")
     else:
-        print(f"LỖI: Không tìm thấy bài viết ID {thread_id}")
+        print(f"ERROR: Could not find post ID {thread_id}")
     conn.close()
 
 def unlock_thread(thread_id):
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE threads SET is_locked = 0 WHERE id = ?", (thread_id,))
+    cursor.execute("UPDATE threads SET is_locked = FALSE WHERE id = %s", (thread_id,))
     conn.commit()
     if cursor.rowcount > 0:
-        print(f"THÀNH CÔNG: Đã MỞ KHÓA bài ID {thread_id}. Cộng đồng có thể tự gắn nhãn lại.")
+        print(f"SUCCESS: UNLOCKED post ID {thread_id}. Community can now re-tag it.")
     else:
-        print(f"LỖI: Không tìm thấy bài viết ID {thread_id}")
+        print(f"ERROR: Could not find post ID {thread_id}")
     conn.close()
 
 def checkin():
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE system_settings SET value = datetime('now') WHERE key = 'last_mod_checkin'")
+    cursor.execute("UPDATE system_settings SET value = TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE key = 'last_mod_checkin'")
     conn.commit()
-    print("THÀNH CÔNG: Đã check-in! Khu vườn sẽ tươi tốt thêm ít nhất 7 ngày nữa.")
+    print("SUCCESS: Checked-in! The Garden will remain active for at least 7 more days.")
     conn.close()
 
 def show_usage():
     print("""
-CÔNG CỤ ĐIỀU PHỐI (MOD TOOL) V3:
-python3 mod_tool.py checkin           : Điểm danh (Tránh Read-Only)
-python3 mod_tool.py list              : Xem bài đang chờ đăng
-python3 mod_tool.py hide <id>         : Ẩn (xóa) bài viết
-python3 mod_tool.py move <id> <cat>   : Chuyển category & Khóa nhãn
-python3 mod_tool.py unlock <id>       : Mở khóa nhãn
-python3 mod_tool.py help              : Hiện hướng dẫn này
+MODERATION TOOL V3:
+python3 mod_tool.py checkin           : Check-in (Avoid Read-Only)
+python3 mod_tool.py list              : View pending posts
+python3 mod_tool.py hide <id>         : Hide (delete) post
+python3 mod_tool.py move <id> <cat>   : Change category & Lock tagging
+python3 mod_tool.py unlock <id>       : Unlock tagging
+python3 mod_tool.py help              : Show this help guide
     """)
 
 if __name__ == "__main__":

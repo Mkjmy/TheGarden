@@ -12,8 +12,11 @@ FROM alpine:latest
 
 WORKDIR /app
 
+RUN apk add --no-cache python3 py3-psycopg2
+
 COPY --from=builder /app/main .
 COPY --from=builder /app/web ./web
+COPY --from=builder /app/mod_tool.py .
 
 EXPOSE 8080
 
