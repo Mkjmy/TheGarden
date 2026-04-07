@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Forum</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>GARDEN</h1>
+        <nav>
+            <a href="/garden">FEED</a>
+            <a href="/post">NEW SIGNAL</a>
+            <a href="/principles">PRINCIPLES</a>
+            <a href="/nap">NAP</a>
+        </nav>
+    </header>
+
+    {{ if .IsReadOnly }}
+        <div style="background: #fff3cd; color: #856404; padding: 1rem; border: 1px solid #ffeeba; border-radius: 4px; text-align: center; margin-bottom: 2rem; font-size: 0.8rem;">
+            <strong>NOTICE:</strong> The Garden is currently in <strong>Read-Only</strong> mode (Moderator inactive for > 1 week). New signals and interactions are temporarily suspended.
+        </div>
+    {{ end }}
+
+    <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 1.5rem; padding-bottom: 0.5rem; align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <a href="/garden?tab=feed" 
+               style="text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: {{ if or (eq .CurrentTab "feed") (eq .CurrentTab "") }}var(--acc){{ else }}var(--muted){{ end }}; border-bottom: 2px solid {{ if or (eq .CurrentTab "feed") (eq .CurrentTab "") }}var(--acc){{ else }}transparent{{ end }}; padding-bottom: 0.5rem;">
+               FEED
+            </a>
+            <a href="/garden?tab=odd" 
+               style="text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: {{ if eq .CurrentTab "odd" }}var(--acc){{ else }}var(--muted){{ end }}; border-bottom: 2px solid {{ if eq .CurrentTab "odd" }}var(--acc){{ else }}transparent{{ end }}; padding-bottom: 0.5rem;">
+               ODD / CREATIVE
+            </a>
+            <a href="/garden?tab=inner" 
+               style="text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: {{ if eq .CurrentTab "inner" }}var(--acc){{ else }}var(--muted){{ end }}; border-bottom: 2px solid {{ if eq .CurrentTab "inner" }}var(--acc){{ else }}transparent{{ end }}; padding-bottom: 0.5rem;">
+               INNER
+            </a>
+            <a href="/garden?tab=thoughts" 
+               style="text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: {{ if eq .CurrentTab "thoughts" }}var(--acc){{ else }}var(--muted){{ end }}; border-bottom: 2px solid {{ if eq .CurrentTab "thoughts" }}var(--acc){{ else }}transparent{{ end }}; padding-bottom: 0.5rem;">
+               THOUGHTS
+            </a>
+            <a href="/garden?tab=top" 
+               style="text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: {{ if eq .CurrentTab "top" }}var(--acc){{ else }}var(--muted){{ end }}; border-bottom: 2px solid {{ if eq .CurrentTab "top" }}var(--acc){{ else }}transparent{{ end }}; padding-bottom: 0.5rem;">
+               SIGNAL
+            </a>
+        </div>
+        
+        <div style="font-size: 0.75rem; color: var(--muted); font-style: italic;">
+            {{ if gt .PendingCount 0 }}
+                <span style="color: var(--acc); font-weight: 700;">●</span> {{ .PendingCount }} seeds growing.
+            {{ end }}
+        </div>
+    </div>
+
+    <main>
+        {{ range .Threads }}
+        <div class="thread-card">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px;">
+                    {{ $vtype := index $.Votes .ID }}
+                    <a href="/vote?id={{ .ID }}&type=up" 
+                       style="font-size: 1.2rem; line-height: 1; text-decoration: none; color: {{ if eq $vtype 1 }}#2e7d32{{ else }}var(--muted){{ end }};">▲</a>
+                    
+                    <span style="font-weight: 800; font-size: 1rem; margin: 4px 0; color: {{ if eq $vtype 1 }}#2e7d32{{ else if eq $vtype -1 }}#d32f2f{{ else }}var(--fg){{ end }};">
+                        {{ .SignalScore }}
+                    </span>
+                    
+                    <a href="/vote?id={{ .ID }}&type=down" 
+                       style="font-size: 1.2rem; line-height: 1; text-decoration: none; color: {{ if eq $vtype -1 }}#d32f2f{{ else }}var(--muted){{ end }};">▼</a>
+                </div>
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.8rem;">
+                        <span style="font-size: 0.65rem; background: var(--border); color: var(--muted); padding: 2px 6px; border-radius: 2px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+                            {{ if eq .Category "odd" }}ODD / CREATIVE{{ else }}{{ .Category }}{{ end }}
+                        </span>
+                    </div>
+                    <a href="/thread?id={{ .ID }}" class="thread-title" style="display: block; margin-bottom: 0.5rem; text-decoration: none;">
+                        {{ .Title }}
+                    </a>
+                    {{ if .ParentTitle }}
+                    <div style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; font-style: italic;">
+                        Replying to: <a href="/thread?id={{ .ParentID.Int64 }}" style="color: var(--muted);">{{ .ParentTitle }}</a> by <strong>{{ .ParentAuthor }}</strong>
+                    </div>
+                    {{ end }}
+                    <div class="thread-meta">
+                        {{ if eq .AuthorName "@anonymous" }}
+                            <span>{{ .AuthorName }}</span>
+                        {{ else }}
+                            <a href="/source?name={{ .AuthorName }}" style="color: var(--muted); text-decoration: underline;">{{ .AuthorName }}</a>
+                        {{ end }}
+                        <span>{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ else }}
+        <p class="tagline">No signals yet. Be the first to broadcast.</p>
+        {{ end }}
+    </main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Create Identity</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .auth-form { max-width: 400px; margin: 4rem auto; border: 1px solid var(--border); padding: 2.5rem; border-radius: 4px; }
+        .auth-form h2 { text-align: center; margin-bottom: 2rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase; color: var(--muted); }
+        .form-control { width: 100%; padding: 0.8rem; border: 1px solid var(--border); background: var(--bg); color: var(--fg); box-sizing: border-box; }
+        .btn-auth { width: 100%; background: var(--acc); color: var(--bg); padding: 0.8rem; border: none; cursor: pointer; font-weight: bold; margin-top: 1rem; }
+        .auth-footer { margin-top: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GARDEN / IDENTITY</h1>
+        <nav><a href="/garden">BACK</a></nav>
+    </header>
+
+    <main class="auth-form">
+        <h2>New Identity</h2>
+        <form action="/register" method="POST">
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="recovery_phrase">Recovery Phrase (Optional)</label>
+                <input type="text" id="recovery_phrase" name="recovery_phrase" class="form-control" placeholder="A secret sentence only you know">
+                <p class="form-hint">A backup secret to reset your password. If left blank, your identity is unrecoverable.</p>
+            </div>
+            <button type="submit" class="btn-auth">CREATE IDENTITY</button>
+        </form>
+        <div class="auth-footer">
+            <p style="margin-bottom: 1rem; line-height: 1.4; color: #d32f2f; font-weight: 600;">
+                IMPORTANT: Due to absolute anonymity, there is NO password recovery mechanism. If you lose your password, your identity is lost forever. Write it down.
+            </p>
+            <p style="margin-bottom: 1rem; line-height: 1.4;">
+                Creating an identity is meant to <strong>protect your alias</strong> and build long-term reputation. 
+                You can still post signals without an account, but if you intend to contribute seriously, 
+                be aware that without an identity, others may impersonate you.
+            </p>
+            Already have an identity? <a href="/login">Log in</a>
+        </div>
+    </main>
+</body>
+</html>

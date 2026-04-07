@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Recover Identity</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .auth-form { max-width: 400px; margin: 4rem auto; border: 1px solid var(--border); padding: 2.5rem; border-radius: 4px; }
+        .auth-form h2 { text-align: center; margin-bottom: 2rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase; color: var(--muted); }
+        .form-control { width: 100%; padding: 0.8rem; border: 1px solid var(--border); background: var(--bg); color: var(--fg); box-sizing: border-box; }
+        .btn-auth { width: 100%; background: var(--acc); color: var(--bg); padding: 0.8rem; border: none; cursor: pointer; font-weight: bold; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GARDEN / RECOVERY</h1>
+        <nav><a href="/login">BACK TO LOGIN</a></nav>
+    </header>
+
+    <main class="auth-form">
+        <h2>Restore Identity</h2>
+        <form action="/recover" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="recovery_phrase">Your Secret Recovery Phrase</label>
+                <input type="text" id="recovery_phrase" name="recovery_phrase" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <input type="password" id="new_password" name="new_password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn-auth">RESET PASSWORD</button>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,118 @@
+:root {
+    --bg: #0a0a0a;
+    --fg: #ededed;
+    --acc: #ffffff;
+    --muted: #888888;
+    --border: #222222;
+    --card-bg: #111111;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-left: 1.5rem;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: var(--acc);
+}
+
+.thread-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    transition: transform 0.1s, border-color 0.2s;
+}
+
+.thread-card:hover {
+    border-color: var(--acc);
+}
+
+.thread-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--fg);
+    text-decoration: none;
+}
+
+.thread-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    gap: 1rem;
+}
+
+.signal-badge {
+    background: var(--acc);
+    color: var(--bg);
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 2px;
+}
+
+.gateway {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.btn {
+    background: var(--acc);
+    color: var(--bg);
+    padding: 0.75rem 2rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+    border-radius: 2px;
+}
+
+.user-status {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.user-status strong { color: var(--acc); }
+.logout-link { margin-left: 10px; color: #d32f2f; text-decoration: none; }
+
+.tagline { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }

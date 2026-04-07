@@ -1,0 +1,4 @@
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 app:8080
+Log notice stdout
+DataDirectory /var/lib/tor

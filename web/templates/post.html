@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Signal Broadcast</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; }
+        .broadcast-grid { display: grid; grid-template-columns: 1fr 350px; gap: 2rem; margin-top: 1rem; }
+        .editor-main { display: flex; flex-direction: column; gap: 1rem; }
+        .input-raw { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--fg); padding: 0.8rem; font-size: 1rem; border-radius: 2px; box-sizing: border-box; }
+        .input-raw:focus { border-color: var(--acc); outline: none; }
+        .title-field { font-size: 1.5rem; font-weight: 700; border: none; border-left: 4px solid var(--acc); padding-left: 1rem; }
+        .content-area { width: 100%; min-height: 65vh; font-family: "JetBrains Mono", "Fira Code", monospace; font-size: 1rem; line-height: 1.6; padding: 1.5rem; resize: vertical; }
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .tool-box { border: 1px solid var(--border); padding: 1.2rem; background: var(--card-bg); }
+        .tool-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; display: block; }
+        .check-list { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; line-height: 1.4; }
+        .check-list li { margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 10px; color: var(--muted); }
+        .check-list strong { color: var(--fg); }
+        .btn-send { background: var(--acc); color: var(--bg); border: none; padding: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; margin-top: 1rem; }
+        .time-map { display: flex; height: 25px; border: 1px solid var(--border); margin: 10px 0; }
+        .slot { flex: 1; height: 100%; border-right: 1px solid var(--border); }
+        .slot.risk { background: #ffebee; }
+        .slot.safe { background: #e8f5e9; }
+        .time-labels { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <header style="margin-bottom: 2rem;">
+        <h1>GARDEN / BROADCAST</h1>
+        <nav>
+            <a href="/garden">FEED</a>
+            <a href="/principles">PRINCIPLES</a>
+            <a href="/nap">NAP</a>
+        </nav>
+    </header>
+
+    {{ if .IsReadOnly }}
+        <div style="background: #fff3cd; color: #856404; padding: 2rem; border: 1px solid #ffeeba; border-radius: 4px; text-align: center; margin: 4rem auto; max-width: 600px;">
+            <h2 style="margin-top: 0;">THE GARDEN IS RESTING</h2>
+            <p>The system is currently in <strong>Read-Only mode</strong> because the moderator has been inactive for an extended period.</p>
+            <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.8;">New signal broadcasts and responses are temporarily disabled to preserve community stability.</p>
+        </div>
+    {{ else }}
+    <form action="/post" method="POST" id="postForm">
+        <input type="hidden" name="parent_id" value="{{ .ParentID }}">
+        <input type="hidden" name="parent_author" value="{{ .ParentAuthor }}">
+        <input type="hidden" name="pow_nonce" id="powNonce">
+        
+        {{ if gt .ParentID 0 }}
+        <div style="background: var(--card-bg); padding: 1rem; border-left: 4px solid var(--acc); margin-bottom: 2rem; font-size: 0.9rem;">
+            You are drafting a <strong>Response Signal</strong> to <strong>{{ .ParentAuthor }}</strong> (Signal #{{ .ParentID }}). 
+            Your analysis will be linked to the original discussion.
+        </div>
+        {{ end }}
+
+        <div class="broadcast-grid">
+            <main class="editor-main">
+                <input type="text" name="title" class="input-raw title-field" placeholder="SIGNAL TITLE" required>
+                <textarea name="content" class="input-raw content-area" placeholder="INPUT DATA (MARKDOWN SUPPORTED)..." required></textarea>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label class="tool-title">Source Alias</label>
+                        <input type="text" name="author_name" class="input-raw" value="@anonymous">
+                    </div>
+                    <div>
+                        <label class="tool-title">Release Delay (Hours)</label>
+                        <input type="number" name="delay_hours" class="input-raw" value="0" min="0" max="72">
+                    </div>
+                </div>
+            </main>
+
+            <aside class="sidebar">
+                <div class="tool-box">
+                    <span class="tool-title">Temporal Strategy (UTC)</span>
+                    <div class="time-labels"><span>00:00</span><span>12:00</span><span>23:00</span></div>
+                    <div class="time-map">
+                        <div class="slot safe"></div><div class="slot safe"></div><div class="slot safe"></div><div class="slot safe"></div>
+                        <div class="slot safe"></div><div class="slot safe"></div><div class="slot safe"></div><div class="slot safe"></div>
+                        <div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div>
+                        <div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div>
+                        <div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div><div class="slot risk"></div>
+                        <div class="slot risk"></div><div class="slot risk"></div><div class="slot safe"></div><div class="slot safe"></div>
+                    </div>
+                </div>
+
+                <div class="tool-box">
+                    <span class="tool-title">Cognitive Safeguards</span>
+                    <ul class="check-list">
+                        <li><input type="checkbox"> <strong>Steel-manning:</strong> Strongest version of opposing view?</li>
+                        <li><input type="checkbox"> <strong>Signal vs Noise:</strong> Meaningful analysis?</li>
+                        <li><input type="checkbox"> <strong>No Attacks:</strong> Focused entirely on ideas?</li>
+                        <li><input type="checkbox"> <strong>Verification:</strong> Sound logic and evidence?</li>
+                        <li><input type="checkbox"> <strong>Humility:</strong> Limits of knowledge acknowledged?</li>
+                    </ul>
+                </div>
+
+                <div class="tool-box">
+                    <span class="tool-title">OPSEC Checklist</span>
+                    <ul class="check-list">
+                        <li><input type="checkbox"> <strong>Stylometric Masking:</strong> Patterns altered?</li>
+                        <li><input type="checkbox"> <strong>Identity Scrubbing:</strong> Identifiers removed?</li>
+                        <li><input type="checkbox"> <strong>Temporal Masking:</strong> Delay masks timezone?</li>
+                        <li><input type="checkbox"> <strong>Metadata:</strong> Links stripped of IDs?</li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center;">
+                    <noscript>
+                        <div style="background: #f8d7da; color: #721c24; padding: 1rem; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 1rem; font-size: 0.8rem; text-align: left;">
+                            <strong>WARNING:</strong> JavaScript is disabled. To post in the Garden, you <strong>must enable JavaScript</strong> to perform the anti-spam proof-of-work. If you are only reading, you can safely keep it disabled.
+                        </div>
+                    </noscript>
+                    <p id="powStatus" style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem;">Anti-spam Proof-of-Work required on broadcast.</p>
+                    <button type="submit" class="btn-send" id="submitBtn" style="width: 100%;">Execute Broadcast</button>
+                </div>
+            </aside>
+        </div>
+    </form>
+
+    <script src="/static/pow.js"></script>
+    {{ end }}
+</body>
+</html>

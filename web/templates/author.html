@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Source: {{ .AuthorName }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .source-header { margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+        .source-header h2 { font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        .source-stats { font-size: 0.9rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GARDEN</h1>
+        <nav>
+            <a href="/garden">FEED</a>
+            <a href="/principles">PRINCIPLES</a>
+            <a href="/nap">NAP</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="source-header">
+            <h2>Source: {{ .AuthorName }}</h2>
+            <div class="source-stats">
+                Displaying all signals broadcasted under this alias.
+            </div>
+        </div>
+
+        <div class="threads-list">
+            {{ range .Threads }}
+            <div class="thread-card">
+                <a href="/thread?id={{ .ID }}" class="thread-title">{{ .Title }}</a>
+                {{ if .ParentTitle }}
+                <div style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; font-style: italic;">
+                    Replying to: <a href="/thread?id={{ .ParentID.Int64 }}" style="color: var(--muted);">{{ .ParentTitle }}</a>
+                </div>
+                {{ end }}
+                <div class="thread-meta">
+                    <span class="signal-badge">{{ .SignalScore }} SIGNAL</span>
+                    <span>{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                </div>
+            </div>
+            {{ else }}
+            <p class="tagline">This source hasn't broadcasted any signals yet.</p>
+            {{ end }}
+        </div>
+    </main>
+</body>
+</html>

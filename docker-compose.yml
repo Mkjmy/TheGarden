@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=garden
+      - POSTGRES_PASSWORD=garden
+      - POSTGRES_DB=garden
+    ports:
+      - "5432:5432"
+    volumes:
+      - garden_db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://garden:garden@db:5432/garden?sslmode=disable
+    depends_on:
+      - db
+
+  tor:
+    image: alpine:latest
+    restart: always
+    entrypoint: ["sh", "-c", "apk add --no-cache tor && chown -R tor:tor /var/lib/tor && chmod -R 700 /var/lib/tor && exec su -s /bin/sh tor -c 'tor -f /etc/tor/torrc'"]
+    volumes:
+      - ./torrc:/etc/tor/torrc:ro
+      - ./tor_data:/var/lib/tor
+    depends_on:
+      - app
+
+volumes:
+  garden_db_data:

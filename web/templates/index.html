@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - Gateway</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .gateway {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .gateway h1 { font-size: 3rem; margin-bottom: 0.5rem; letter-spacing: -0.05em; }
+        .tagline { margin-bottom: 3rem; font-size: 1.1rem; color: var(--muted); }
+        
+        .soul-links {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .soul-card {
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--fg);
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .soul-card:hover {
+            border-color: var(--acc);
+            background: var(--card-bg);
+        }
+        
+        .soul-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--acc); }
+        .soul-card p { margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+
+        .enter-zone {
+            width: 100%;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="gateway">
+        <h1>GARDEN</h1>
+        <p class="tagline">An anonymous space for thoughtful dialogue.</p>
+        
+        <div class="soul-links">
+            <a href="/principles" class="soul-card">
+                <h3>The Principles</h3>
+                <p>Our shared philosophy, community safeguards, and the mission of this space.</p>
+            </a>
+            
+            <a href="/nap" class="soul-card">
+                <h3>Community Guidelines (NAP)</h3>
+                <p>Our shared agreement on non-aggression and mutual respect.</p>
+            </a>
+        </div>
+
+        <div class="enter-zone">
+            <a href="/garden" class="btn" style="display: block; text-align: center;">BƯỚC VÀO / ENTER THE FORUM</a>
+        </div>
+    </div>
+</body>
+</html>

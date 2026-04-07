@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN - {{ .Post.Title }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .thread-detail { margin-top: 2rem; }
+        .thread-header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .thread-header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        .thread-body { font-size: 1.1rem; line-height: 1.8; color: var(--fg); }
+        .thread-body p { margin-bottom: 1.5rem; }
+        .thread-body code { background: var(--card-bg); padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .thread-body blockquote { border-left: 4px solid var(--acc); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--muted); }
+        .response-card { border-left: 3px solid var(--border); padding-left: 1.5rem; margin-bottom: 2rem; }
+        .response-card:hover { border-left-color: var(--acc); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GARDEN</h1>
+        <nav>
+            <a href="/garden">FEED</a>
+            <a href="/principles">PRINCIPLES</a>
+            <a href="/nap">NAP</a>
+        </nav>
+    </header>
+
+    {{ if .IsReadOnly }}
+        <div style="background: #fff3cd; color: #856404; padding: 1rem; border: 1px solid #ffeeba; border-radius: 4px; text-align: center; margin-bottom: 2rem; font-size: 0.8rem;">
+            <strong>NOTICE:</strong> The Garden is currently in <strong>Read-Only</strong> mode (Moderator inactive for > 1 week). New signals and interactions are temporarily suspended.
+        </div>
+    {{ end }}
+
+    <main class="thread-detail">
+        <article>
+            <div class="thread-header" style="display: flex; gap: 2rem; align-items: flex-start;">
+                <div style="display: flex; flex-direction: column; align-items: center; padding-top: 0.5rem; min-width: 50px;">
+                    {{ $vtype := index $.Votes .Post.ID }}
+                    <a href="/vote?id={{ .Post.ID }}&type=up" style="font-size: 1.5rem; text-decoration: none; color: {{ if eq $vtype 1 }}#2e7d32{{ else }}var(--muted){{ end }};">▲</a>
+                    <span style="font-weight: 800; font-size: 1.2rem; margin: 5px 0; color: {{ if eq $vtype 1 }}#2e7d32{{ else if eq $vtype -1 }}#d32f2f{{ else }}var(--fg){{ end }};">{{ .Post.SignalScore }}</span>
+                    <a href="/vote?id={{ .Post.ID }}&type=down" style="font-size: 1.5rem; text-decoration: none; color: {{ if eq $vtype -1 }}#d32f2f{{ else }}var(--muted){{ end }};">▼</a>
+                </div>
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.65rem; background: var(--acc); color: var(--bg); padding: 2px 8px; border-radius: 2px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em;">
+                            {{ if eq .Post.Category "odd" }}ODD / CREATIVE{{ else }}{{ .Post.Category }}{{ end }}
+                        </span>
+                    </div>
+                    <h2>{{ .Post.Title }}</h2>
+                    <div class="thread-meta">
+                        <span>Source: 
+                            {{ if eq .Post.AuthorName "@anonymous" }}
+                                {{ .Post.AuthorName }}
+                            {{ else }}
+                                <a href="/source?name={{ .Post.AuthorName }}" style="color: var(--muted); text-decoration: underline;">{{ .Post.AuthorName }}</a>
+                            {{ end }}
+                        </span>
+                        <span> • {{ .Post.CreatedAt.Format "Jan 02, 2006" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="thread-body">{{ .Body }}</div>
+
+            <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-top: 1px dashed var(--border); padding-top: 1.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--muted);">Classify:</span>
+                    {{ range .TagStats }}
+                    <span style="font-size: 0.7rem; background: var(--card-bg); border: 1px solid var(--border); padding: 4px 8px; border-radius: 2px;">{{ .Category }} ({{ .Count }})</span>
+                    {{ end }}
+                </div>
+                {{ if not .IsReadOnly }}
+                <a href="/post?parent_id={{ .Post.ID }}&parent_author={{ .Post.AuthorName }}" style="background: var(--acc); color: var(--bg); padding: 0.6rem 1.2rem; text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 2px;">Respond to this Signal</a>
+                {{ end }}
+            </div>
+        </article>
+
+        <section style="margin-top: 5rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+            <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 2rem;">Related Signals (Responses)</h3>
+            
+            <div class="responses-list">
+                {{ range .Responses }}
+                <div class="response-card">
+                    <a href="/thread?id={{ .ID }}" style="text-decoration: none; color: var(--fg); font-weight: 600; display: block; margin-bottom: 0.5rem;">{{ .Title }}</a>
+                    <div style="font-size: 0.75rem; color: var(--muted);">
+                        <span style="font-weight: 800; color: var(--acc);">{{ .SignalScore }} SIGNAL</span> 
+                        • Source: {{ .AuthorName }} 
+                        • {{ .CreatedAt.Format "Jan 02, 2006" }}
+                    </div>
+                </div>
+                {{ else }}
+                <div style="padding: 2rem; background: var(--card-bg); border: 1px dashed var(--border); text-align: center; border-radius: 4px;">
+                    <p style="color: var(--muted); font-size: 0.9rem; margin: 0; line-height: 1.6;">
+                        <strong>Analysis over Reaction.</strong><br>
+                        In the Garden, we do not use simple comments. Every response is a new Signal, encouraging deeper thought and structured analysis. If you have a counter-argument or a reflection, use the button above to broadcast a linked signal.
+                    </p>
+                </div>
+                {{ end }}
+            </div>
+
+            <div style="margin-top: 4rem; background: var(--card-bg); padding: 2rem; border-radius: 4px;">
+                <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Community Tagging</h4>
+                <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.4;">
+                    <strong>Democratic Classification:</strong> You decide where this signal belongs. When enough participants suggest the same tag, the signal will automatically move. 
+                    <em>(Consensus threshold is dynamic, based on current community averages for each tab).</em>
+                </p>
+                {{ if not .IsReadOnly }}
+                <form action="/comment" method="POST" style="display: flex; align-items: center; gap: 1.5rem;">
+                    <input type="hidden" name="thread_id" value="{{ .Post.ID }}">
+                    <select name="suggested_tag" style="background: var(--bg); border: 1px solid var(--border); color: var(--fg); padding: 0.5rem; outline: none; cursor: pointer; font-size: 0.8rem;">
+                        <option value="">Suggest Classification...</option>
+                        <option value="odd">ODD / CREATIVE</option>
+                        <option value="inner">INNER (Confessions)</option>
+                        <option value="thoughts">THOUGHTS</option>
+                        <option value="signal">SIGNAL</option>
+                    </select>
+                    <button type="submit" style="background: var(--acc); color: var(--bg); border: none; padding: 0.5rem 1.5rem; font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.75rem;">Suggest Tag</button>
+                </form>
+                {{ else }}
+                <p style="font-size: 0.75rem; color: #856404; font-style: italic;">Community classification is temporarily disabled in Read-Only mode.</p>
+                {{ end }}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
