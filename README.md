@@ -11,7 +11,7 @@
 - give link to others
 
   
-SECURITY NOTE: Default database password is 'change-me'. 
+SECURITY NOTE: Default database password is 'CHANGE_ME'. 
     If you expose port 5432 or modify network settings, change the password in 
     docker-compose.yml immediately to prevent unauthorized access.
 
