@@ -4,10 +4,10 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=garden
-      - POSTGRES_PASSWORD=garden
+      - POSTGRES_PASSWORD=CHANGE_ME  
       - POSTGRES_DB=garden
-    ports:
-      - "5432:5432"
+    #ports:
+     # - "5432:5432"
     volumes:
       - garden_db_data:/var/lib/postgresql/data
 
